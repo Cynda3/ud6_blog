@@ -12,7 +12,7 @@
 */
 
 
-Route::get('/', 'HomeControllerSinAuth@index');
+Route::get('/', 'BlogController@index');
 
 Route::resource('posts', 'PostController@index');
 Auth::routes();
