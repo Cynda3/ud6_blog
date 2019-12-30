@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Post;
 
-class BlogController extends Controller
+class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +13,9 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('published_at', 'desc')->get();
-        return view('welcome')->with(['posts' => $posts]);
+        $user = Auth::user();
+        $posts = Post::where('user_id', $user->id)->get();
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -25,7 +25,8 @@ class BlogController extends Controller
      */
     public function create()
     {
-        //
+        $categorias = Category::all();
+        return view('posts.createPost', array('categorias'=>$categorias));
     }
 
     /**
@@ -36,6 +37,16 @@ class BlogController extends Controller
      */
     public function store(Request $request)
     {
+        
+        $post = new Post;
+        $post->title = $request->title;
+        $post->excerpt = $request->excerpt;
+        $post->body = $request->body;
+        $post->image = $request->image;
+
+        $post->save();
+
+        return redirect()->back();
     }
 
     /**
@@ -46,7 +57,9 @@ class BlogController extends Controller
      */
     public function show($id)
     {
-        //
+        $post = Post::find($id);
+        $this->authorize('view', $post);
+        return view('posts.show', compact('post'));
     }
 
     /**
@@ -57,7 +70,9 @@ class BlogController extends Controller
      */
     public function edit($id)
     {
-        //
+        $categorias = Category::all();
+        $post = Post::find($id);
+        return view('posts.update')->with(['categorias' => $categorias, 'post' => $post]);
     }
 
     /**
@@ -69,7 +84,15 @@ class BlogController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $post = new Post;
+        $post->title = $request->title;
+        $post->excerpt = $request->excerpt;
+        $post->body = $request->body;
+        $post->image = $request->image;
+
+        $post->save();
+
+        return redirect()->back();
     }
 
     /**
@@ -80,6 +103,9 @@ class BlogController extends Controller
      */
     public function destroy($id)
     {
-        //
+        
+        $post = Post::find($id);
+        $post->delete();
+        return redirect(route('post.index'));
     }
 }
