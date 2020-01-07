@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Post;
+use App\User;
+use Auth;
 
 class PostController extends Controller
 {
@@ -15,7 +18,7 @@ class PostController extends Controller
     {
         $user = Auth::user();
         $posts = Post::where('user_id', $user->id)->get();
-        return view('posts.index', compact('posts'));
+        return view('posts.index')->with('posts', $posts);
     }
 
     /**
@@ -25,8 +28,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categorias = Category::all();
-        return view('posts.createPost', array('categorias'=>$categorias));
+        return view('posts.createPost');
     }
 
     /**
@@ -37,16 +39,20 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
         
         $post = new Post;
         $post->title = $request->title;
         $post->excerpt = $request->excerpt;
         $post->body = $request->body;
         $post->image = $request->image;
+        $post->user_id = $user->id;
 
         $post->save();
 
-        return redirect()->back();
+
+        $posts = Post::where('user_id', $user->id)->get();
+        return view('posts.index')->with('posts', $posts);
     }
 
     /**
@@ -70,9 +76,8 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        $categorias = Category::all();
         $post = Post::find($id);
-        return view('posts.update')->with(['categorias' => $categorias, 'post' => $post]);
+        return view('posts.updatePost')->with(['post' => $post]);
     }
 
     /**
@@ -84,15 +89,20 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $post = new Post;
+
+        $user = Auth::user();
+
+        $post = Post::find($id);
         $post->title = $request->title;
         $post->excerpt = $request->excerpt;
         $post->body = $request->body;
         $post->image = $request->image;
+        $post->user_id = $post->user_id;
 
         $post->save();
 
-        return redirect()->back();
+        $posts = Post::where('user_id', $user->id)->get();
+        return view('posts.index')->with('posts', $posts);
     }
 
     /**
@@ -104,8 +114,12 @@ class PostController extends Controller
     public function destroy($id)
     {
         
+        $user = Auth::user();
+
         $post = Post::find($id);
         $post->delete();
-        return redirect(route('post.index'));
+        
+        $posts = Post::where('user_id', $user->id)->get();
+        return view('posts.index')->with('posts', $posts);
     }
 }

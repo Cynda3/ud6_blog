@@ -12,14 +12,5 @@ class CategorySeeder extends Seeder
      */
     public function run()
     {
-        $json = File::get("database/data/categoriesData.json");
-        $data = json_decode($json);
-
-        foreach ($data as $categorie) {
-            $newc = new Category;
-            $newc->id = $categorie->id;
-            $newc->name = $categorie->name;
-            $newc->save();
-        }
     }
 }

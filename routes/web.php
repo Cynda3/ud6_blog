@@ -19,3 +19,11 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::resource('post', 'PostController')->only(['index','create','store','show','edit','update','destroy']);
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+// Ruta admin
+
+Route::get('/admin', 'AdminController@index')->middleware('auth', 'role:admin')->name('/admin');
