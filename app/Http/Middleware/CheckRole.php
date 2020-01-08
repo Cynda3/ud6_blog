@@ -15,9 +15,13 @@ class CheckRole
      */
     public function handle($request, Closure $next, $role)  
     {
-        if (! $request->user()->hasRole($role)) {
-            return redirect('home');
+        // Compruebo los roles que tiene el usuario y miro si alguno es el que busco
+        foreach ($request->user()->roles as $role) {
+            if ($role == "admin") {
+                return redirect('home');
+            }
+            return $next($request);
         }
-        return $next($request);
+
     }
 }
